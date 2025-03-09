@@ -1,9 +1,14 @@
 <?php 
+    require 'nav_front.php';
     require_once '../include/db.php';
     $id = $_GET['id'];
     $sqlState = $pdo->prepare('SELECT * FROM categorie WHERE id=?');
     $sqlState->execute([$id]);
     $categorie = $sqlState->fetch(PDO::FETCH_ASSOC);
+
+    $sqlState = $pdo->prepare('SELECT * FROM produit WHERE id_categorie=?');
+    $sqlState->execute([$id]);
+    $produits = $sqlState->fetchAll(PDO::FETCH_OBJ);
     ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,8 +20,26 @@
 </head>
 <body>
     <div class="container">
-        <h1><?= $categorie['libelle'] ?></h1>
-        
+        <h1><?= $categorie['libelle'] ?></h1> 
+        <div class="container">
+            <div class="row">
+                <?php
+                    foreach($produits as $produit){
+                ?>
+                    <div class="card mb-3 col-md-4">
+                        <img src="https://picsum.photos/id/237/200/300" style="width: 100%; height: 300px;" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <a href="<?php echo 'produit.php?id_produit='.$produit->id?>" class="btn stretched-link">Afficher détaille</a>
+                            <h5 class="card-title"><?= $produit->libelle ?></h5>
+                            <p class="card-text"><?= $produit->prix ?>MAD</p>
+                            <p class="card-text"><small class="text-body-secondary">Ajouter le : <?= date_format(date_create($produit->date_creation), 'Y/m/d') ?></small></p>
+                        </div>
+                    </div>
+                <?php
+                    }
+                ?>
+            </div>
+        </div>   
     </div>
 </body>
 </html>

@@ -12,7 +12,11 @@
     include 'include/nav.php'; ?>
     <div class="container">
         <?php
-            if (isset($_POST['ajouter'])) {
+            $id = $_GET['id'];
+            $res = $pdo->prepare('SELECT * FROM produit WHERE id = ?');
+            $res->execute([$id]);
+            $r = $res->fetch(PDO::FETCH_ASSOC);
+            if (isset($_POST['modifier'])) {
                 $libelle = $_POST['libelle'];
                 $prix = $_POST['prix'];
                 $discount = $_POST['discount'];
@@ -20,14 +24,22 @@
                 $desc = $_POST['desc'];
                 $date = date('y-m-d');
                 if(!empty($libelle) && !empty($prix) && !empty($categorie)){
-                    $sqlState = $pdo->prepare('INSERT INTO produit VALUES(null, ?, ?, ?, ?, ?, ?)');
-                    $inserted = $sqlState->execute([$libelle, $prix, $discount, $categorie, $date, $desc]);
+                    $sqlState = $pdo->prepare('UPDATE produit SET 
+                                                    libelle = ?,
+                                                    prix = ?,
+                                                    discount = ?,
+                                                    id_categorie = ?, 
+                                                    date_creation = ?,
+                                                    description = ?
+                                                    WHERE id = ?
+                    ');
+                    $inserted = $sqlState->execute([$libelle, $prix, $discount, $categorie, $date, $desc, $id]);
                     if($inserted){
                     header('location:produits.php');
                     }else{
                     ?>
                         <div class="alert alert-danger" role="alert">
-                            Data base erreur
+                            erreur de base données
                         </div>
                     <?php   
                     }
@@ -44,22 +56,26 @@
         <form method="post">
             <div class="mb-3">
                 <label class="form-label">Libelle</label>
-                <input name="libelle" type="text" class="form-control">
+                <input name="libelle" type="text" class="form-control" value='<?= $r['libelle'] ?>'>
             </div>
             <div class="mb-3">
                 <label class="form-label">Prix</label>
-                <input name="prix" type="number" class="form-control" min='0' step="0.1">
+                <input name="prix" type="number" class="form-control" min='0' step="0.1" value='<?= $r['prix'] ?>'>
             </div>
             <div class="mb-3">
                 <label class="form-label">Discount</label>
-                <input name="discount" type="range" class="form-control" min='0' max='100' value="0">
+                <input name="discount" type="range" class="form-control" min='0' max='100' value="<?= $r['discount'] ?>">
             </div>
             <?php
                 $categories = $pdo->query('SELECT * FROM categorie')->fetchAll(PDO::FETCH_ASSOC);
+                $id_c = $r['id_categorie'];
+                $c = $pdo->prepare('SELECT * FROM categorie WHERE id = ?');
+                $c->execute([$id_c]);
+                $ctg = $c->fetch(PDO::FETCH_ASSOC);
             ?>
             <label class="form-label">Categorie</label>
             <select name="categorie" class="form-control">
-                <option value="">Choisissez une catégorie</option>
+                <option value="<?= $r['id_categorie'] ?>"><?= $ctg['libelle'] ?></option>
                 <?php 
                     foreach ($categories as $categorie) {
                         echo '<option value="' . $categorie['id'] . '">' . $categorie['libelle'] . '</option>';
@@ -68,10 +84,11 @@
             </select>
             <div class="mb-3">
                 <label class="form-label">Description</label>
-                <textarea name="desc" class="form-control"></textarea>
+                <textarea name="desc" class="form-control"><?php echo htmlspecialchars($r['description']); ?></textarea>
             </div>
+
             <br><br>
-            <input type="submit" class="btn btn-primary" value="Ajouter" name="ajouter">
+            <input type="submit" class="btn btn-primary" value="Modifier produit" name="modifier">
         </form>
     </div>
 </body>

@@ -19,7 +19,7 @@
                     <th>Prix</th> 
                     <th>Discount</th>
                     <th>Prix final</th>
-                    <th>ID categorie</th>
+                    <th>Categorie</th>
                     <th>Date</th>
                     <th>Operations</th>
                 </tr>
@@ -42,8 +42,8 @@
                         <td><?= $produit['libelle_categorie'] ?></td>
                         <td><?= $produit['date_creation'] ?></td>
                         <td>
-                            <input type="submit" class="btn btn-primary btn-sm" value="modifier">
-                            <input type="submit" class="btn btn-danger btn-sm" value="supprimer">
+                            <a href="modifier_produit.php?id=<?= $produit['id'] ?>" class="btn btn-primary btn-sm" >modifier</a>
+                            <a href="supprimer_produit.php?id=<?= $produit['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('voulez vous vraiment supprimer le produit <?= $produit['libelle']?> ?');">supprimer</a>
                         </td>
                     </tr>
                 <?php
