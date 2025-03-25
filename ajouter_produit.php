@@ -19,9 +19,17 @@
                 $categorie = $_POST['categorie'];
                 $desc = $_POST['desc'];
                 $date = date('y-m-d');
+
+                $file_name = "";
+                if(isset($_FILES['image'])){
+                    $image = $_FILES['image']['name'];
+                    $file_name = uniqid().$image;
+                    move_uploaded_file($_FILES['image']['tmp_name'], 'upload/produit'.$file_name);
+                }
+
                 if(!empty($libelle) && !empty($prix) && !empty($categorie)){
-                    $sqlState = $pdo->prepare('INSERT INTO produit VALUES(null, ?, ?, ?, ?, ?, ?)');
-                    $inserted = $sqlState->execute([$libelle, $prix, $discount, $categorie, $date, $desc]);
+                    $sqlState = $pdo->prepare('INSERT INTO produit VALUES(null, ?, ?, ?, ?, ?, ?, ?)');
+                    $inserted = $sqlState->execute([$libelle, $prix, $discount, $categorie, $date,  $desc, $file_name]);
                     if($inserted){
                     header('location:produits.php');
                     }else{
@@ -40,8 +48,8 @@
                 }
             }
         ?>
-        <h1>Ajouter ajouter_produit</h1>
-        <form method="post">
+        <h1>Ajouter produit</h1>
+        <form method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Libelle</label>
                 <input name="libelle" type="text" class="form-control">
@@ -49,6 +57,10 @@
             <div class="mb-3">
                 <label class="form-label">Prix</label>
                 <input name="prix" type="number" class="form-control" min='0' step="0.1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="desc" class="form-control"></textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label">Discount</label>
@@ -67,8 +79,8 @@
                 ?>
             </select>
             <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea name="desc" class="form-control"></textarea>
+                <label class="form-label">Image</label>
+                <input name="image" type="file" class="form-control" >
             </div>
             <br><br>
             <input type="submit" class="btn btn-primary" value="Ajouter" name="ajouter">

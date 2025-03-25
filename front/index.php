@@ -20,7 +20,7 @@
             foreach($categories as $categorie){
         ?> 
             <li class="list-group-item">
-                <a href="categorie.php?id=<?=$categorie->id?>" class='btn btn-light'><i class="fa-solid fa-carrot"></i> <?=$categorie->libelle?></a>
+                <a href="categorie.php?id=<?=$categorie->id?>" class='btn btn-light'><i class="<?=$categorie->icone?>"></i> <?=$categorie->libelle?></a>
             </li>
             <?php      
             }
